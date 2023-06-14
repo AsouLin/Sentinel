@@ -67,7 +67,7 @@ public class ClusterBuilderSlot extends AbstractLinkedProcessorSlot<DefaultNode>
      * at the very beginning while concurrent map will hold the lock all the time.
      * </p>
      */
-    private static volatile Map<ResourceWrapper, ClusterNode> clusterNodeMap = new HashMap<>();
+    private static volatile Map<ResourceWrapper, ClusterNode> clusterNodeMap = new HashMap<>(); // 静态全局map用来记录所有的ClusterNode
 
     private static final Object lock = new Object();
 

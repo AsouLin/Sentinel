@@ -63,9 +63,12 @@ public class ContextUtil {
     }
 
     private static void initDefaultContext() {
+        // 初始化一个sentinel_default_context，type为in的队形
         String defaultContextName = Constants.CONTEXT_DEFAULT_NAME;
         EntranceNode node = new EntranceNode(new StringResourceWrapper(defaultContextName, EntryType.IN), null);
+        // Constants.ROOT会初始化一个name是machine-root，type=IN的对象
         Constants.ROOT.addChild(node);
+        // 所以现在map里面有一个key=CONTEXT_DEFAULT_NAME的对象
         contextNameNodeMap.put(defaultContextName, node);
     }
 
@@ -118,6 +121,7 @@ public class ContextUtil {
     }
 
     protected static Context trueEnter(String name, String origin) {
+        // 先尝试从ThreadLocal中获取
         Context context = contextHolder.get();
         if (context == null) {
             Map<String, DefaultNode> localCacheNameMap = contextNameNodeMap;

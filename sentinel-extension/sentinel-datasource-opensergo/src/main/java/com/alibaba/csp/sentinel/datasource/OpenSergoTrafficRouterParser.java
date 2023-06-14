@@ -74,6 +74,7 @@ public class OpenSergoTrafficRouterParser {
                 TrafficRouter trafficRouter = new TrafficRouter();
                 trafficRouters.add(trafficRouter);
                 //todo 怎么知道是rpc/http?
+                // virtuaklHostList似乎没有标记rpc还是http
                 String remoteAppName = "";
                 String[] serviceAndPort = virtualHost.getName().split(":");
                 if (serviceAndPort.length > 0) {

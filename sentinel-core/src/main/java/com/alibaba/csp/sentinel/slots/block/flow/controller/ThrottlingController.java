@@ -56,6 +56,7 @@ public class ThrottlingController implements TrafficShapingController {
         this.statDurationMs = statDurationMs;
         // Use nanoSeconds when durationMs%count != 0 or count/durationMs> 1 (to be accurate)
         if (maxCountPerStat > 0) {
+            // 如果在统计周期内的请求数量除以统计周期的毫秒数大于1，或者在统计周期内具体的某一段时间内请求数量不能被maxCountPerStat整除
             this.useNanoSeconds = statDurationMs % Math.round(maxCountPerStat) != 0 || maxCountPerStat / statDurationMs > 1;
         } else {
             this.useNanoSeconds = false;
@@ -105,6 +106,7 @@ public class ThrottlingController implements TrafficShapingController {
     private boolean checkPassUsingCachedMs(int acquireCount, double maxCountPerStat) {
         long currentTime = TimeUtil.currentTimeMillis();
         // Calculate the interval between every two requests.
+        // 将请求平均分配到1s中
         long costTime = Math.round(1.0d * statDurationMs * acquireCount / maxCountPerStat);
 
         // Expected pass time of this request.
@@ -117,10 +119,12 @@ public class ThrottlingController implements TrafficShapingController {
         } else {
             // Calculate the time to wait.
             long waitTime = costTime + latestPassedTime.get() - TimeUtil.currentTimeMillis();
+            // 如果等待时间比当前时间大maxQueueingTimeMs，就直接返回false阻塞
             if (waitTime > maxQueueingTimeMs) {
                 return false;
             }
 
+            // 计算上次时间加上这次请求要耗费的时间
             long oldTime = latestPassedTime.addAndGet(costTime);
             waitTime = oldTime - TimeUtil.currentTimeMillis();
             if (waitTime > maxQueueingTimeMs) {
@@ -129,6 +133,7 @@ public class ThrottlingController implements TrafficShapingController {
             }
             // in race condition waitTime may <= 0
             if (waitTime > 0) {
+                // 请求太频繁了，先睡一会
                 sleepMs(waitTime);
             }
             return true;

@@ -36,18 +36,22 @@ public class MetricTimerListener implements Runnable {
     private static final MetricWriter metricWriter = new MetricWriter(SentinelConfig.singleMetricFileSize(),
         SentinelConfig.totalMetricFileCount());
 
+    // 做定时的数据采集，然后写到log文件去
     @Override
     public void run() {
         Map<Long, List<MetricNode>> maps = new TreeMap<>();
+        // 遍历集群节点
         for (Entry<ResourceWrapper, ClusterNode> e : ClusterBuilderSlot.getClusterNodeMap().entrySet()) {
             ClusterNode node = e.getValue();
             Map<Long, MetricNode> metrics = node.metrics();
             aggregate(maps, metrics, node);
         }
+        // 汇总前面统计的信息
         aggregate(maps, Constants.ENTRY_NODE.metrics(), Constants.ENTRY_NODE);
         if (!maps.isEmpty()) {
             for (Entry<Long, List<MetricNode>> entry : maps.entrySet()) {
                 try {
+                    // 写入日志
                     metricWriter.write(entry.getKey(), entry.getValue());
                 } catch (Exception e) {
                     RecordLog.warn("[MetricTimerListener] Write metric error", e);

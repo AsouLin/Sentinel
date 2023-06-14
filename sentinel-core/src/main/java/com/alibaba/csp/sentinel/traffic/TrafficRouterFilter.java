@@ -46,6 +46,7 @@ public class TrafficRouterFilter implements RouterFilter {
 
     @Override
     public List<Instance> filter(List<Instance> instanceList, TrafficContext context) throws TrafficException {
+        // 路由执行逻辑
         if (null == instanceList || instanceList.size() == 0) {
             return instanceList;
         }

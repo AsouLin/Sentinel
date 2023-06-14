@@ -48,18 +48,25 @@ import java.util.concurrent.TimeUnit;
  */
 public class FlowRuleManager {
 
+    // 规则集合
     private static volatile Map<String, List<FlowRule>> flowRules = new HashMap<>();
 
+    // 监听器
     private static final FlowPropertyListener LISTENER = new FlowPropertyListener();
+
+    // 监听配置是否变化
     private static SentinelProperty<List<FlowRule>> currentProperty = new DynamicSentinelProperty<List<FlowRule>>();
 
+    // 创建一个延迟的线程池
     /** the corePool size of SCHEDULER must be set at 1, so the two task ({@link #startMetricTimerListener()} can run orderly by the SCHEDULER **/
     @SuppressWarnings("PMD.ThreadPoolCreationRule")
     private static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(1,
         new NamedThreadFactory("sentinel-metrics-record-task", true));
 
     static {
+        // 设置监听
         currentProperty.addListener(LISTENER);
+        // 开启定时监控
         startMetricTimerListener();
     }
 
@@ -80,6 +87,7 @@ public class FlowRuleManager {
                 SentinelConfig.METRIC_FLUSH_INTERVAL);
             return;
         }
+        // 每一秒调用一次 MetricTimerListener#run
         SCHEDULER.scheduleAtFixedRate(new MetricTimerListener(), 0, flushInterval, TimeUnit.SECONDS);
     }
 
@@ -151,6 +159,7 @@ public class FlowRuleManager {
 
         @Override
         public synchronized void configUpdate(List<FlowRule> value) {
+            // 在配置变更时加载规则
             Map<String, List<FlowRule>> rules = FlowRuleUtil.buildFlowRuleMap(value);
             if (rules != null) {
                 flowRules = rules;

@@ -169,6 +169,7 @@ public final class DegradeRuleManager {
      * @return new circuit breaker based on provided rule; null if rule is invalid or unsupported type
      */
     private static CircuitBreaker newCircuitBreakerFrom(/*@Valid*/ DegradeRule rule) {
+        // 根据规则构造对应的断路器实现类
         switch (rule.getGrade()) {
             case RuleConstant.DEGRADE_GRADE_RT:
                 return new ResponseTimeCircuitBreaker(rule);
@@ -204,9 +205,11 @@ public final class DegradeRuleManager {
     private static class RulePropertyListener implements PropertyListener<List<DegradeRule>> {
 
         private synchronized void reloadFrom(List<DegradeRule> list) {
+            // 构建断路器
             Map<String, List<CircuitBreaker>> cbs = buildCircuitBreakers(list);
             Map<String, Set<DegradeRule>> rm = new HashMap<>(cbs.size());
 
+            // 去规则重复的断路器来保存ruleNap
             for (Map.Entry<String, List<CircuitBreaker>> e : cbs.entrySet()) {
                 assert e.getValue() != null && !e.getValue().isEmpty();
 
@@ -247,6 +250,7 @@ public final class DegradeRuleManager {
                 if (StringUtil.isBlank(rule.getLimitApp())) {
                     rule.setLimitApp(RuleConstant.LIMIT_APP_DEFAULT);
                 }
+                // 尝试获取已经存在的断路器 没有就新建
                 CircuitBreaker cb = getExistingSameCbOrNew(rule);
                 if (cb == null) {
                     RecordLog.warn("[DegradeRuleManager] Unknown circuit breaking strategy, ignoring: {}", rule);

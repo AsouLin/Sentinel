@@ -46,10 +46,12 @@ public class FlowRuleChecker {
         if (ruleProvider == null || resource == null) {
             return;
         }
+        // 返回FlowRulerManager里注册的所有规则
         Collection<FlowRule> rules = ruleProvider.apply(resource.getName());
         if (rules != null) {
             for (FlowRule rule : rules) {
                 if (!canPassCheck(rule, context, node, count, prioritized)) {
+                    // 如果请求不通过就抛异常
                     throw new FlowException(rule.getLimitApp(), rule);
                 }
             }
@@ -65,23 +67,27 @@ public class FlowRuleChecker {
                                                     boolean prioritized) {
         String limitApp = rule.getLimitApp();
         if (limitApp == null) {
+            // 如果没有设置就不校验，默认会有个”default“
             return true;
         }
 
         if (rule.isClusterMode()) {
+            // 集群模式校验
             return passClusterCheck(rule, context, node, acquireCount, prioritized);
         }
 
+        // 本地模式校验
         return passLocalCheck(rule, context, node, acquireCount, prioritized);
     }
 
     private static boolean passLocalCheck(FlowRule rule, Context context, DefaultNode node, int acquireCount,
                                           boolean prioritized) {
+        // 选择节点
         Node selectedNode = selectNodeByRequesterAndStrategy(rule, context, node);
         if (selectedNode == null) {
             return true;
         }
-
+        // 根据规则拦截
         return rule.getRater().canPass(selectedNode, acquireCount, prioritized);
     }
 

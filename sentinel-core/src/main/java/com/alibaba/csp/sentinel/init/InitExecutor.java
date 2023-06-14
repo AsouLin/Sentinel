@@ -39,10 +39,12 @@ public final class InitExecutor {
      * The initialization will be executed only once.
      */
     public static void doInit() {
+        // 初始化一次，并且初始化失败会退出
         if (!initialized.compareAndSet(false, true)) {
             return;
         }
         try {
+            // spi加载InitFuc子类，默认 com.alibaba.csp.sentinel.metric.extension.MetricCallbackInit
             List<InitFunc> initFuncs = SpiLoader.of(InitFunc.class).loadInstanceListSorted();
             List<OrderWrapper> initList = new ArrayList<OrderWrapper>();
             for (InitFunc initFunc : initFuncs) {
@@ -50,6 +52,7 @@ public final class InitExecutor {
                 insertSorted(initList, initFunc);
             }
             for (OrderWrapper w : initList) {
+                // 调用MetricCallbackInit的init方法
                 w.func.init();
                 RecordLog.info("[InitExecutor] Executing {} with order {}",
                     w.func.getClass().getCanonicalName(), w.order);

@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.LongAdder;
  */
 public class MetricBucket {
 
+    // MetricBucket为每个窗口通过一个内部数组counters统计了这个窗口内的所有数据。
     private final LongAdder[] counters;
 
     private volatile long minRt;
@@ -37,6 +38,7 @@ public class MetricBucket {
         for (MetricEvent event : events) {
             counters[event.ordinal()] = new LongAdder();
         }
+        // 初始化MinRt 默认 5000
         initMinRt();
     }
 

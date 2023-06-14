@@ -155,13 +155,16 @@ public class ArrayMetric implements Metric {
     @Override
     public List<MetricNode> details() {
         List<MetricNode> details = new ArrayList<>();
+        // 调用BucketLeapArray
         data.currentWindow();
+        // 列出统计结果
         List<WindowWrap<MetricBucket>> list = data.list();
         for (WindowWrap<MetricBucket> window : list) {
             if (window == null) {
                 continue;
             }
 
+            // 对统计结果进行封装
             details.add(fromBucket(window));
         }
 
@@ -199,6 +202,7 @@ public class ArrayMetric implements Metric {
         } else {
             node.setRt(wrap.value().rt());
         }
+        // 设置窗口开始时间
         node.setTimestamp(wrap.windowStart());
         node.setOccupiedPassQps(wrap.value().occupiedPass());
         return node;
@@ -241,7 +245,9 @@ public class ArrayMetric implements Metric {
 
     @Override
     public void addPass(int count) {
+        // 获取当前时间窗口
         WindowWrap<MetricBucket> wrap = data.currentWindow();
+        // 窗口内的pass+1
         wrap.value().addPass(count);
     }
 

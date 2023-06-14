@@ -118,6 +118,7 @@ public abstract class LeapArray<T> {
             return null;
         }
 
+        // 判断属于哪个窗口
         int idx = calculateTimeIdx(timeMillis);
         // Calculate current bucket start time.
         long windowStart = calculateWindowStart(timeMillis);
@@ -130,6 +131,7 @@ public abstract class LeapArray<T> {
          * (3) Bucket is deprecated, then reset current bucket.
          */
         while (true) {
+            // 获取窗口里的老数据
             WindowWrap<T> old = array.get(idx);
             if (old == null) {
                 /*
@@ -152,6 +154,8 @@ public abstract class LeapArray<T> {
                     // Contention failed, the thread will yield its time slice to wait for bucket available.
                     Thread.yield();
                 }
+                // 如果对应时间窗口的开始时间与计算得到的开始时间一样
+                // 那么代表当前即是我们要找的窗口对象，直接返回
             } else if (windowStart == old.windowStart()) {
                 /*
                  *     B0       B1      B2     B3      B4
@@ -166,6 +170,7 @@ public abstract class LeapArray<T> {
                  */
                 return old;
             } else if (windowStart > old.windowStart()) {
+                //如果当前的开始时间小于原开始时间，那么就更新到新的开始时间
                 /*
                  *   (old)
                  *             B0       B1      B2    NULL      B4

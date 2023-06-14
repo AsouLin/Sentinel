@@ -78,6 +78,7 @@ public class OpenSergoDataSourceGroup {
     public OpenSergoDataSourceGroup(String host, int port, String namespace, String app) {
         AssertUtil.notEmpty(namespace, "namespace cannot be empty");
         AssertUtil.notEmpty(app, "app cannot be empty");
+        // 调用OpenSergo客户端管理接口来获取客户端
         this.openSergoClient = OpenSergoClientManager.get().getOrCreateClient(host, port);
         this.namespace = namespace;
         this.app = app;

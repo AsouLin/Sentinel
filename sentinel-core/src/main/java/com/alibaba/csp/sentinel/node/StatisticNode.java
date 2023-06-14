@@ -96,6 +96,7 @@ public class StatisticNode implements Node {
     private transient volatile Metric rollingCounterInSecond = new ArrayMetric(SampleCountProperty.SAMPLE_COUNT,
         IntervalProperty.INTERVAL);
 
+    // 构建 60s的数据，设置60个1s的滑动窗口； 创建的是BucketLeapArray实例来统计
     /**
      * Holds statistics of the recent 60 seconds. The windowLengthInMs is deliberately set to 1000 milliseconds,
      * meaning each bucket per second, in this way we can get accurate statistics of each second.
@@ -115,15 +116,19 @@ public class StatisticNode implements Node {
     @Override
     public Map<Long, MetricNode> metrics() {
         // The fetch operation is thread-safe under a single-thread scheduler pool.
+        // 当前滑动窗口的开始时间
         long currentTime = TimeUtil.currentTimeMillis();
         currentTime = currentTime - currentTime % 1000;
         Map<Long, MetricNode> metrics = new ConcurrentHashMap<>();
+        // 获取滑动窗口里统计的数据
         List<MetricNode> nodesOfEverySecond = rollingCounterInMinute.details();
         long newLastFetchTime = lastFetchTime;
         // Iterate metrics of all resources, filter valid metrics (not-empty and up-to-date).
         for (MetricNode node : nodesOfEverySecond) {
+            // 筛选符合的滑动窗口节点
             if (isNodeInTime(node, currentTime) && isValidMetricNode(node)) {
                 metrics.put(node.getTimestamp(), node);
+                // 选出符合节点里最大的时间戳数据赋值
                 newLastFetchTime = Math.max(newLastFetchTime, node.getTimestamp());
             }
         }

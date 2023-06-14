@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 @Aspect
 public class SentinelResourceAspect extends AbstractSentinelAspectSupport {
 
+    // 切入点名
     @Pointcut("@annotation(com.alibaba.csp.sentinel.annotation.SentinelResource)")
     public void sentinelResourceAnnotationPointcut() {
     }
@@ -53,6 +54,7 @@ public class SentinelResourceAspect extends AbstractSentinelAspectSupport {
         int resourceType = annotation.resourceType();
         Entry entry = null;
         try {
+            // 资源增强
             entry = SphU.entry(resourceName, resourceType, entryType, pjp.getArgs());
             return pjp.proceed();
         } catch (BlockException ex) {

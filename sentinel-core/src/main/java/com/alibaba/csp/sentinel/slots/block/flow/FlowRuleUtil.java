@@ -99,6 +99,7 @@ public final class FlowRuleUtil {
             if (StringUtil.isBlank(rule.getLimitApp())) {
                 rule.setLimitApp(RuleConstant.LIMIT_APP_DEFAULT);
             }
+            // 设置拒绝策略: 直接拒绝、Warm Up、匀速排队，默认是DefaultController
             TrafficShapingController rater = generateRater(rule);
             rule.setRater(rater);
 
@@ -133,9 +134,11 @@ public final class FlowRuleUtil {
         if (rule.getGrade() == RuleConstant.FLOW_GRADE_QPS) {
             switch (rule.getControlBehavior()) {
                 case RuleConstant.CONTROL_BEHAVIOR_WARM_UP:
+                    // WarmUpPeriodSec默认是10
                     return new WarmUpController(rule.getCount(), rule.getWarmUpPeriodSec(),
                             ColdFactorProperty.coldFactor);
                 case RuleConstant.CONTROL_BEHAVIOR_RATE_LIMITER:
+                    // MaxQueueingTimeMs 默认500
                     return new ThrottlingController(rule.getMaxQueueingTimeMs(), rule.getCount());
                 case RuleConstant.CONTROL_BEHAVIOR_WARM_UP_RATE_LIMITER:
                     return new WarmUpRateLimiterController(rule.getCount(), rule.getWarmUpPeriodSec(),

@@ -140,10 +140,12 @@ import java.util.Map;
  */
 @Spi(order = Constants.ORDER_FLOW_SLOT)
 public class FlowSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
+    // 根据预设的规则，检查是否允许通过
 
     private final FlowRuleChecker checker;
 
     public FlowSlot() {
+        // 实例化规则检查器
         this(new FlowRuleChecker());
     }
 
@@ -176,6 +178,7 @@ public class FlowSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
         fireExit(context, resourceWrapper, count, args);
     }
 
+    // 规则提供器
     private final Function<String, Collection<FlowRule>> ruleProvider = new Function<String, Collection<FlowRule>>() {
         @Override
         public Collection<FlowRule> apply(String resource) {
