@@ -6,6 +6,8 @@ com.alibaba.csp.sentinel.slots.clusterbuilder.ClusterBuilderSlot
 com.alibaba.csp.sentinel.slots.logger.LogSlot
 # 统计实时的调用数据
 com.alibaba.csp.sentinel.slots.statistic.StatisticSlot
+# 路由组的拦截处理
+com.alibaba.csp.sentinel.tag.TagTrafficSlot
 # 用于对入口的资源进行调配
 com.alibaba.csp.sentinel.slots.block.authority.AuthoritySlot
 com.alibaba.csp.sentinel.slots.system.SystemSlot
