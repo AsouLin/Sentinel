@@ -1,13 +1,10 @@
-package com.alibaba.csp.sentinel.tag;
+package com.alibaba.csp.sentinel.traffic.tag;
 
 import com.alibaba.csp.sentinel.Constants;
-import com.alibaba.csp.sentinel.ResourceTypeConstants;
 import com.alibaba.csp.sentinel.context.Context;
 import com.alibaba.csp.sentinel.node.DefaultNode;
 import com.alibaba.csp.sentinel.slotchain.AbstractLinkedProcessorSlot;
 import com.alibaba.csp.sentinel.slotchain.ResourceWrapper;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import com.alibaba.csp.sentinel.spi.Spi;
 import com.alibaba.csp.sentinel.util.function.Function;
 
@@ -42,11 +39,11 @@ public class TagTrafficSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
     }
 
     // 规则提供器
-    private final Function<String, Collection<TagRule>> ruleProvider = new Function<String, Collection<TagRule>>() {
+    private final Function<String, Collection<InstanceRule>> ruleProvider = new Function<String, Collection<InstanceRule>>() {
         @Override
-        public Collection<TagRule> apply(String resource) {
+        public Collection<InstanceRule> apply(String resource) {
             // tag - instances
-            Map<String, List<TagRule>> tagRules = TagRuleManager.getTagRuleMap();
+            Map<String, List<InstanceRule>> tagRules = TagRuleManager.getTagRuleMap();
             return tagRules.get(resource);
         }
     };

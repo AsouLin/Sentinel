@@ -1,4 +1,4 @@
-package com.alibaba.csp.sentinel.tag;
+package com.alibaba.csp.sentinel.traffic.tag;
 
 import com.alibaba.csp.sentinel.context.Context;
 import com.alibaba.csp.sentinel.slotchain.ResourceWrapper;
@@ -12,25 +12,23 @@ import java.util.Collection;
 
 public class TrafficTagChecker {
 
-    private RequestProxy requestProxy;
-
     private ClusterManager clusterManager;
 
 
-    public void checkTag(Function<String, Collection<TagRule>> ruleProvider, ResourceWrapper resource, Context context) throws BlockException {
+    public void checkTag(Function<String, Collection<InstanceRule>> ruleProvider, ResourceWrapper resource, Context context) throws BlockException {
         if (ruleProvider == null || resource == null) {
             return;
         }
-        System.out.println("++++++++++++++running +++++++++++++++++");
-        // 获取资源的标记，并检查标记与本机是否匹配。
-        Collection<TagRule> rules = ruleProvider.apply(resource.getName());
-        System.out.println("do apply");
+        // 获取资源的标记，并检查标记与请求服务是否匹配。
+        Collection<InstanceRule> rules = ruleProvider.apply(resource.getName());
         // 获取标签
         String marked = getMarked();
         System.out.println("marked: "+ marked);
         if (StringUtil.isNotBlank(marked)) {
 
             // todo 路由到对应的机器上
+            // 构建实例对应的路由规则 TrafficContext
+
 
 //            clusterManager.route()
         } else {
@@ -39,7 +37,7 @@ public class TrafficTagChecker {
             System.out.println("make Tag");
         }
         if (rules != null) {
-            for (TagRule rule : rules) {
+            for (InstanceRule rule : rules) {
                 // todo 如何完善流量筛选规则检查
                 if (!canPassTag(rule, resource, context)) {
                     throw new TagException(rule.getLimitApp(), rule);
@@ -57,7 +55,7 @@ public class TrafficTagChecker {
     }
 
     // todo
-    private boolean canPassTag(TagRule rule, ResourceWrapper resource, Context context) {
+    private boolean canPassTag(InstanceRule rule, ResourceWrapper resource, Context context) {
         // todo 获取clusterInstance
         if (rule.getInstances().contains(context.getName())) {
             return true;

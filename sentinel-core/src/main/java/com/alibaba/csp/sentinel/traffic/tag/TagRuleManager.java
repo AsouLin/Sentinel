@@ -1,4 +1,4 @@
-package com.alibaba.csp.sentinel.tag;
+package com.alibaba.csp.sentinel.traffic.tag;
 
 import com.alibaba.csp.sentinel.log.RecordLog;
 import com.alibaba.csp.sentinel.property.DynamicSentinelProperty;
@@ -13,37 +13,37 @@ import java.util.Map;
 public class TagRuleManager {
 
     // todo 敲定规则形式
-    private static volatile Map<String, List<TagRule>> tagRules = new HashMap<>();
+    private static volatile Map<String, List<InstanceRule>> tagRules = new HashMap<>();
 
     // 监听器
     private static final TagRuleManager.TagPropertyListener LISTENER = new TagRuleManager.TagPropertyListener();
 
     // 监听配置是否变化
-    private static final SentinelProperty<List<TagRule>> currentProperty = new DynamicSentinelProperty<List<TagRule>>();
+    private static final SentinelProperty<List<InstanceRule>> currentProperty = new DynamicSentinelProperty<List<InstanceRule>>();
 
     static {
         // 设置监听
         currentProperty.addListener(LISTENER);
     }
 
-    public static List<TagRule> getRules() {
-        List<TagRule> rules = new ArrayList<TagRule>();
-        for (Map.Entry<String, List<TagRule>> entry : tagRules.entrySet()) {
+    public static List<InstanceRule> getRules() {
+        List<InstanceRule> rules = new ArrayList<InstanceRule>();
+        for (Map.Entry<String, List<InstanceRule>> entry : tagRules.entrySet()) {
             rules.addAll(entry.getValue());
         }
         return rules;
     }
 
-    static Map<String, List<TagRule>> getTagRuleMap() {
+    static Map<String, List<InstanceRule>> getTagRuleMap() {
         return tagRules;
     }
 
-    private static final class TagPropertyListener implements PropertyListener<List<TagRule>> {
+    private static final class TagPropertyListener implements PropertyListener<List<InstanceRule>> {
 
         @Override
-        public synchronized void configUpdate(List<TagRule> value) {
-            // 在配置变更时加载规则
-            Map<String, List<TagRule>> rules = TagRuleUtil.buildTagRuleMap(value);
+        public synchronized void configUpdate(List<InstanceRule> value) {
+            // 在配置变更时加载规则 主要在此处获取nacos等配置
+            Map<String, List<InstanceRule>> rules = TagRuleUtil.buildTagRuleMap(value);
             if (rules != null) {
                 tagRules = rules;
             }
@@ -51,8 +51,8 @@ public class TagRuleManager {
         }
 
         @Override
-        public synchronized void configLoad(List<TagRule> conf) {
-            Map<String, List<TagRule>> rules = TagRuleUtil.buildTagRuleMap(conf);
+        public synchronized void configLoad(List<InstanceRule> conf) {
+            Map<String, List<InstanceRule>> rules = TagRuleUtil.buildTagRuleMap(conf);
             if (rules != null) {
                 tagRules = rules;
             }

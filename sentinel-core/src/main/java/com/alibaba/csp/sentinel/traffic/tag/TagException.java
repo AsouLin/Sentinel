@@ -1,4 +1,4 @@
-package com.alibaba.csp.sentinel.tag;
+package com.alibaba.csp.sentinel.traffic.tag;
 
 import com.alibaba.csp.sentinel.slots.block.AbstractRule;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
